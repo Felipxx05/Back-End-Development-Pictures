@@ -36,21 +36,19 @@ def count():
 @app.route("/picture", methods=["GET"])
 def get_pictures():
     if data:
-        return jsonfy(data), 200
+        return jsonify(data), 200
     return {"message": "Internal server error"}, 500
+
 
 ######################################################################
 # GET A PICTURE
 ######################################################################
-
-
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
     for picture in data:
         if picture["id"] == id:
             return jsonify(picture), 200
     return {"message": "picture not found"}, 404
-
 
 
 ######################################################################
@@ -62,10 +60,9 @@ def create_picture():
     if not picture_in:
         return {"message": "Invalid input parameter"}, 422
 
-    # Verificar si ya existe una imagen con ese id
     for picture in data:
         if picture["id"] == picture_in["id"]:
-            return {"message": f"picture with id {picture['id']} already present"}, 302
+            return {"Message": f"picture with id {picture['id']} already present"}, 302
 
     data.append(picture_in)
     return jsonify(picture_in), 201
@@ -74,15 +71,28 @@ def create_picture():
 ######################################################################
 # UPDATE A PICTURE
 ######################################################################
-
-
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    picture_in = request.get_json()
+    if not picture_in:
+        return {"message": "Invalid input parameter"}, 422
+
+    for index, picture in enumerate(data):
+        if picture["id"] == id:
+            data[index] = picture_in
+            return jsonify(picture_in), 200
+
+    return {"message": "imagen no encontrada"}, 404
+    
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for index, picture in enumerate(data):
+        if picture["id"] == id:
+            del data[index]
+            return "", 204
+
+    return {"message": "picture not found"}, 404
